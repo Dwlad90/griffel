@@ -13,12 +13,15 @@ export type TransformOptions = {
 export type TransformResult = {
   code: string;
   sourceMap: NonNullable<Babel.BabelFileResult['map']> | undefined;
+  metadata?: Babel.BabelFileMetadata | undefined;
 };
 
 /**
  * Transforms passed source code with Babel, uses user's config for parsing, but ignores it for transforms.
  */
 export function transformSync(sourceCode: string, options: TransformOptions): TransformResult {
+  console.log('!!!!transpile');
+
   // Parse the code first so Babel will use user's babel config for parsing
   // During transforms we don't want to use user's config
   const babelAST = Babel.parseSync(sourceCode, {
@@ -51,6 +54,7 @@ export function transformSync(sourceCode: string, options: TransformOptions): Tr
   }
 
   return {
+    ...babelFileResult,
     code: babelFileResult.code as string,
     sourceMap: babelFileResult.map === null ? undefined : babelFileResult.map,
   };

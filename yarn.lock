@@ -6635,6 +6635,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webpack-virtual-modules@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@types/webpack-virtual-modules@npm:0.1.1"
+  dependencies:
+    "@types/webpack": ^4
+  checksum: fad1a76e09c58a56562c8bc3299e5cb0beae0b7457c0762508bbb9fec8eaf9194ad38ef84e8e500eb09dad1206e17270e62eb027dba71c8626d0f5b9eb123159
+  languageName: node
+  linkType: hard
+
 "@types/webpack@npm:^4, @types/webpack@npm:^4.41.26, @types/webpack@npm:^4.41.8":
   version: 4.41.32
   resolution: "@types/webpack@npm:4.41.32"
@@ -13244,6 +13253,7 @@ __metadata:
     "@types/react-dom": 17.0.9
     "@types/stylis": 4.0.2
     "@types/tmp": 0.2.3
+    "@types/webpack-virtual-modules": ^0.1.1
     "@typescript-eslint/eslint-plugin": ~5.3.0
     "@typescript-eslint/parser": ~5.3.0
     ajv: ^8.4.0

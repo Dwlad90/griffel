@@ -4,7 +4,9 @@
     "module": "commonjs",
     "outDir": "../../dist/out-tsc",
     "declaration": true,
-    "types": ["node", "environment"]
+    "types": ["node", "environment"],
+    "esModuleInterop": true,
+    "lib": ["es2019"]
   },
   "exclude": ["__fixtures__/*/*.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"]

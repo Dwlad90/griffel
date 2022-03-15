@@ -155,8 +155,20 @@ export const transformPlugin = declare<Partial<BabelPluginOptions>, PluginObj<Ba
               const stylesBySlots: Record<string /* slot */, GriffelStyle> = evaluationResult.value;
               const [classnamesMapping, cssRules] = resolveStyleRulesForSlots(stylesBySlots);
 
+              const dedupeCss = dedupeCSSRules(cssRules);
               // TODO: find a better way to replace arguments
-              callExpressionPath.node.arguments = [astify(classnamesMapping), astify(dedupeCSSRules(cssRules))];
+              callExpressionPath.node.arguments = [astify(classnamesMapping), astify(dedupeCss)];
+
+              if (!(state.file.metadata as any).style9) {
+                (state.file.metadata as any).style9 = '';
+              }
+
+              (state.file.metadata as any).style9 += (dedupeCss?.d || []).join('');
+
+              console.log('!!!bbbb', dedupeCSSRules(cssRules));
+              // callExpressionPath.node.arguments.forEach((x:any) => {
+              //     console.log('!!!!!aaaaa', x.properties);
+              // });
             });
           }
 

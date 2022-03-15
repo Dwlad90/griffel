@@ -1,10 +1,11 @@
 import { configSchema, BabelPluginOptions } from '@griffel/babel-preset';
 import { EvalCache, Module } from '@linaria/babel-preset';
 import * as enhancedResolve from 'enhanced-resolve';
-import { getOptions } from 'loader-utils';
+import { getOptions, interpolateName } from 'loader-utils';
 import * as path from 'path';
 import { validate } from 'schema-utils';
 import * as webpack from 'webpack';
+import virtualModules from './virtualModules.js';
 
 import { transformSync, TransformResult, TransformOptions } from './transformSync';
 
@@ -117,7 +118,27 @@ export function webpackLoader(
   }
 
   if (result) {
-    this.callback(null, result.code, result.sourceMap);
+    if (!(result.metadata as any).style9) {
+      this.callback(null, result.code, result.sourceMap);
+    } else {
+      this.cacheable(false);
+
+      const virtualFileName = '[path][name].[hash:base64:7].griffel.css';
+
+      const { code, sourceMap, metadata } = result;
+
+      const cssPath = interpolateName(this, virtualFileName, {
+        content: (metadata as any).style9,
+      });
+
+      console.log('!!!!cssPath', cssPath);
+
+      virtualModules.writeModule(cssPath, (metadata as any).style9);
+      const inlineLoader = '';
+
+      const postfix = `\nimport '${inlineLoader + cssPath}';`;
+      this.callback(null, code + postfix, sourceMap);
+    }
     return;
   }
 
