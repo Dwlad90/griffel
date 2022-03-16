@@ -6,6 +6,7 @@ import * as path from 'path';
 import { validate } from 'schema-utils';
 import * as webpack from 'webpack';
 import virtualModules from './virtualModules.js';
+import { pluginName, styleSheetName } from './extract-plugin';
 
 import { transformSync, TransformResult, TransformOptions } from './transformSync';
 
@@ -50,10 +51,10 @@ export function webpackLoader(
 
   const options = getOptions(this) as WebpackLoaderOptions;
 
-  validate(configSchema, options, {
-    name: '@fluentui/make-styles-webpack-loader',
-    baseDataPath: 'options',
-  });
+  // validate(configSchema, options, {
+  //   name: '@fluentui/make-styles-webpack-loader',
+  //   baseDataPath: 'options',
+  // });
 
   // Early return to handle cases when makeStyles() calls are not present, allows to avoid expensive invocation of Babel
   if (!shouldTransformSourceCode(sourceCode, options.modules)) {
@@ -123,7 +124,7 @@ export function webpackLoader(
     } else {
       this.cacheable(false);
 
-      const virtualFileName = '[path][name].[hash:base64:7].griffel.css';
+      const virtualFileName = '[path][name].[hash:base64:7].griffel-css.css';
 
       const { code, sourceMap, metadata } = result;
 
@@ -133,14 +134,93 @@ export function webpackLoader(
 
       console.log('!!!!cssPath', cssPath);
 
-      virtualModules.writeModule(cssPath, (metadata as any).style9);
+      // virtualModules.writeModule(cssPath, (metadata as any).style9);
       const inlineLoader = '';
 
       const postfix = `\nimport '${inlineLoader + cssPath}';`;
-      this.callback(null, code + postfix, sourceMap);
+      this.callback(null, code, sourceMap);
     }
     return;
   }
 
   this.callback(error);
+}
+
+/**
+ * Returns user configuration.
+ *
+ * @param context
+ * @returns
+ */
+function getLoaderOptions(context: any) {
+  const {
+    bake = true,
+    extract = false,
+    importReact = undefined,
+    nonce = undefined,
+    resolve = {},
+    extensions = undefined,
+    babelPlugins = [],
+    [pluginName]: isPluginEnabled = false,
+  } = typeof context.getOptions === 'undefined'
+    ? // Webpack v4 flow
+      getOptions(context)
+    : // Webpack v5 flow
+      context.getOptions({
+        type: 'object',
+        properties: {
+          bake: {
+            type: 'boolean',
+          },
+          extract: {
+            type: 'boolean',
+          },
+          importReact: {
+            type: 'boolean',
+          },
+          nonce: {
+            type: 'string',
+          },
+          resolve: {
+            type: 'object',
+          },
+          extensions: {
+            type: 'array',
+          },
+          babelPlugins: {
+            type: 'array',
+          },
+          [pluginName]: {
+            type: 'boolean',
+          },
+        },
+      });
+
+  return {
+    bake,
+    extract,
+    importReact,
+    nonce,
+    resolve,
+    extensions,
+    babelPlugins,
+    [pluginName]: isPluginEnabled,
+  };
+}
+
+let hasErrored = false;
+
+export function pitch(this: any): void {
+  const options = getLoaderOptions(this);
+  if (!hasErrored && options.extract && !options[pluginName]) {
+    this.emitError(
+      new Error(
+        'webpack-loader' +
+          `You forgot to add the 'CompiledExtractPlugin' plugin (i.e \`{ plugins: [new CompiledExtractPlugin()] }\`), please read https://compiledcssinjs.com/docs/css-extraction-webpack`,
+      ),
+    );
+
+    // We only want to error once, if we didn't do this you'd get an error for every file found.
+    hasErrored = true;
+  }
 }

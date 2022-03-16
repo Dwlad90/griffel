@@ -1,0 +1,50 @@
+{
+  "root": "packages/babel-plugin-strip",
+  "sourceRoot": "packages/babel-plugin-strip/src",
+  "projectType": "library",
+  "implicitDependencies": ["!@griffel/react"],
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/babel-plugin-strip/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/babel-plugin-strip"],
+      "options": {
+        "jestConfig": "packages/babel-plugin-strip/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nrwl/node:package",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/babel-plugin-strip",
+        "tsConfig": "packages/babel-plugin-strip/tsconfig.lib.json",
+        "packageJson": "packages/babel-plugin-strip/package.json",
+        "main": "packages/babel-plugin-strip/src/index.ts",
+        "assets": [
+          "packages/babel-plugin-strip/README.md",
+          {
+            "glob": "LICENSE.md",
+            "input": ".",
+            "output": "."
+          }
+        ]
+      }
+    },
+    "type-check": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "cwd": "packages/babel-plugin-strip",
+        "commands": [{ "command": "tsc -b --pretty" }],
+        "outputPath": []
+      }
+    }
+  },
+  "tags": []
+}

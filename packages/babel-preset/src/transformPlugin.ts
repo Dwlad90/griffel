@@ -8,6 +8,7 @@ import { astify } from './utils/astify';
 import { evaluatePaths } from './utils/evaluatePaths';
 import { BabelPluginOptions } from './types';
 import { validateOptions } from './validateOptions';
+import template from '@babel/template';
 
 type BabelPluginState = PluginPass & {
   importDeclarationPath?: NodePath<t.ImportDeclaration>;
@@ -95,6 +96,16 @@ function dedupeCSSRules(cssRules: CSSRulesByBucket): CSSRulesByBucket {
   return cssRules;
 }
 
+export const toURIComponent = (rule: string): string => {
+  const component = encodeURIComponent(rule).replace(/!/g, '%21');
+
+  return component;
+};
+
+const styleSheetName = 'griffel-css';
+
+const styleSheetPath = `@griffel/css-loader!@griffel/css-loader/${styleSheetName}.css`;
+
 export const transformPlugin = declare<Partial<BabelPluginOptions>, PluginObj<BabelPluginState>>((api, options) => {
   api.assertVersion(7);
 
@@ -112,7 +123,7 @@ export const transformPlugin = declare<Partial<BabelPluginOptions>, PluginObj<Ba
     ...options,
   };
 
-  validateOptions(pluginOptions);
+  // validateOptions(pluginOptions);
 
   return {
     name: '@griffel/babel-plugin-transform',
@@ -163,7 +174,26 @@ export const transformPlugin = declare<Partial<BabelPluginOptions>, PluginObj<Ba
                 (state.file.metadata as any).style9 = '';
               }
 
-              (state.file.metadata as any).style9 += (dedupeCss?.d || []).join('');
+              (state.file.metadata as any).style9 += (dedupeCss?.d || []).concat(dedupeCss?.t || []).join('');
+
+              // if (this && (this.opts as any).styleSheetPath) {
+              // preserveLeadingComments(path);
+              // console.log('!!!!!!strip2', (this.opts as any).styleSheetPath, (this as any)['styleRules'] || [], path);
+
+              // ((this as any)['styleRules'] || []).forEach((rule: string) => {
+              // Each found atomic rule will create a new import that uses the styleSheetPath provided.
+              // The benefit is two fold:
+              // (1) thread safe collection of styles
+              // (2) caching -- resulting in faster builds (one import per rule!)
+              // const params = toURIComponent(rule);
+              console.log('!!!!!!strip111111');
+
+              const params = toURIComponent((state.file.metadata as any).style9);
+              path.unshiftContainer('body', template.ast(`require("${styleSheetPath}?style=${params}");`));
+              // We use require instead of import so it works with both ESM and CJS source.
+              // If we used ESM it would blow up with CJS source, unfortunately.
+              // });
+              // }
 
               console.log('!!!bbbb', dedupeCSSRules(cssRules));
               // callExpressionPath.node.arguments.forEach((x:any) => {

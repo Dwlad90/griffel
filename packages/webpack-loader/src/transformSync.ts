@@ -15,6 +15,7 @@ export type TransformResult = {
   sourceMap: NonNullable<Babel.BabelFileResult['map']> | undefined;
   metadata?: Babel.BabelFileMetadata | undefined;
 };
+export const styleSheetName = 'griffel-css';
 
 /**
  * Transforms passed source code with Babel, uses user's config for parsing, but ignores it for transforms.
@@ -47,6 +48,15 @@ export function transformSync(sourceCode: string, options: TransformOptions): Tr
     sourceMaps: options.enableSourceMaps,
     sourceFileName: options.filename,
     inputSourceMap: options.inputSourceMap,
+    // plugins: [
+    //   [
+    //     // eslint-disable-next-line @typescript-eslint/no-var-requires
+    //     '@griffel/babel-plugin-strip',
+    //     {
+    //       styleSheetPath: `@griffel/webpack-loader/css-loader!@griffel/webpack-loader/css-loader/${styleSheetName}.css`,
+    //     },
+    //   ],
+    // ],
   });
 
   if (babelFileResult === null) {

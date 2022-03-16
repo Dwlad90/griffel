@@ -3,10 +3,12 @@
   "projects": {
     "@griffel/e2e-typescript": "e2e/typescript",
     "@griffel/babel-preset": "packages/babel-preset",
+    "@griffel/babel-plugin-strip": "packages/babel-plugin-strip",
     "@griffel/core": "packages/core",
     "@griffel/jest-serializer": "packages/jest-serializer",
     "@griffel/react": "packages/react",
     "@griffel/webpack-loader": "packages/webpack-loader",
-    "@griffel/website": "apps/website"
+    "@griffel/website": "apps/website",
+    "@griffel/css-loader": "packages/css-loader"
   }
 }
